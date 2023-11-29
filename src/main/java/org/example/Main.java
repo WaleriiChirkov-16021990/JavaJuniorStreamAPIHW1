@@ -2,12 +2,12 @@ package org.example;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-// Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
-// then press Enter. You can now see whitespace characters in your code.
+
 @SuppressWarnings("EndlessStream")
 public class Main {
     public static void main(String[] args) {
@@ -72,17 +72,30 @@ public class Main {
         randomEmployees.stream().map(Employee::getDepartment).distinct().forEach(System.out::println);
 
 //        *2.3 Всем сотрудникам, чья зарплата меньше 10_000, повысить зарплату на 20 %
+// для наглядности изменения добавил peek
+        randomEmployees.stream().filter(employee -> employee.getSalary() < 10_000).peek(System.out::println).map(employee -> {
+            employee.setSalary(employee.getSalary() * 1.2);
+            return employee;
+        }).forEach(System.out::println);
 
-//        randomEmployees.stream().filter(employee -> employee.getSalary() < 10_000).map(employee -> employee.setSalary(5000)).forEach(System.out::println);
+
+//        Из списка сотрудников с помощью стрима создать Map<String, List<Employee>> с отделами и сотрудниками внутри отдела
+
+        Map<String, List<Employee>> employeeMap = randomEmployees.stream()
+                .collect(Collectors.groupingBy(Employee::getDepartment));
+
+        for (Map.Entry<String, List<Employee>> entry : employeeMap.entrySet()) {
+            System.out.println("Отдел: " + entry.getKey());
+            System.out.println("Сотрудники: " + entry.getValue());
+            System.out.println();
+        }
+
+//        * 2.5 * Из списка сотрудников с помощью стрима создать Map<String, Double> с отделами и средней зарплатой внутри отдела
+        Map<String, Double> departmentAverageSalaryMap = randomEmployees.stream()
+                .collect(Collectors.groupingBy(Employee::getDepartment,
+                        Collectors.averagingDouble(Employee::getSalary)));
+
+        System.out.println(departmentAverageSalaryMap);
+
     }
-
-
-//        Map<Boolean, List<Cat>> sortedCats = randomEmployees.stream().collect(Collectors.groupingBy(
-//                cat -> randomEmployees
-//                        .stream()
-//                        .filter(cat1 -> cat1.birthDa)
-//                        .collect(Collectors.summingInt(o -> o.weight))
-//                        .intValue() > 100;
-
-
 }
